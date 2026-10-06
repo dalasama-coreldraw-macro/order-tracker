@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creative Digital - Offset & Apparel Order Management</title>
+
+<!-- Firebase SDK Compatibility -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Segoe UI, Arial, sans-serif;
+}
+
+body{
+    background:#f3f5f9;
+    color:#202633;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    height:70px;
+    background:#0f172a;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 25px;
+    position:sticky;
+    top:0;
+    z-index:100;
+    box-shadow:0 2px 10px rgba(0,0,0,.15);
+}
+
+.logo-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo-badge{
+    background:#2563eb;
+    color:white;
+    font-weight:900;
+    font-size:16px;
+    padding:6px 12px;
+    border-radius:8px;
+    letter-spacing:1px;
+}
+
+.logo{
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:.5px;
+}
+
+.logo span{
+    color:#38bdf8;
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    font-size:13px;
+    color:#cbd5e1;
+}
+
+.sync-status{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:700;
+    background:#064e3b;
+    color:#6ee7b7;
+    border:1px solid #047857;
+}
+
+.pulse-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#34d399;
+}
+
+/* ================= LAYOUT ================= */
+
+.container{
+    padding:22px;
+    max-width:1600px;
+    margin:auto;
+}
+
+/* ================= DASHBOARD CARDS ================= */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:white;
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+    border:1px solid #e5e7eb;
+}
+
+.card-title{
+    font-size:12px;
+    font-weight:700;
+    color:#64748b;
+    margin-bottom:8px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+.card-value{
+    font-size:26px;
+    font-weight:800;
+    color:#0f172a;
+}
+
+/* ================= TOOLBAR ================= */
+
+.toolbar{
+    background:white;
+    border-radius:14px;
+    padding:15px;
+    margin-bottom:18px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+    align-items:center;
+}
+
+button{
+    border:none;
+    padding:11px 17px;
+    border-radius:9px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:13px;
+    transition:.2s;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+}
+
+button:hover{
+    transform:translateY(-1px);
+    opacity:.93;
+}
+
+.btn-primary{
+    background:#2563eb;
+    color:white;
+}
+
+.btn-success{
+    background:#16a34a;
+    color:white;
+}
+
+.btn-warning{
+    background:#f59e0b;
+    color:white;
+}
+
+.btn-danger{
+    background:#dc2626;
+    color:white;
+}
+
+.btn-dark{
+    background:#1e293b;
+    color:white;
+}
+
+.btn-secondary{
+    background:#f1f5f9;
+    color:#334155;
+    border:1px solid #cbd5e1;
+}
+
+.search{
+    flex:1;
+    min-width:220px;
+    padding:11px 14px;
+    border:1px solid #d1d5db;
+    border-radius:9px;
+    outline:none;
+    font-size:13px;
+}
+
+select{
+    padding:11px 13px;
+    border:1px solid #d1d5db;
+    border-radius:9px;
+    background:white;
+    outline:none;
+    font-size:13px;
+}
+
+/* ================= TABLE ================= */
+
+.table-box{
+    background:white;
+    border-radius:14px;
+    overflow:auto;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+    border:1px solid #e5e7eb;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:1200px;
+}
+
+th{
+    background:#f8fafc;
+    padding:13px 15px;
+    text-align:left;
+    font-size:12px;
+    color:#475569;
+    border-bottom:1px solid #e5e7eb;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+}
+
+td{
+    padding:13px 15px;
+    border-bottom:1px solid #edf0f3;
+    font-size:13px;
+}
+
+tr:hover{
+    background:#f8fafc;
+}
+
+.job-link{
+    color:#2563eb;
+    font-weight:800;
+    cursor:pointer;
+    text-decoration:none;
+    background:#eff6ff;
+    padding:4px 8px;
+    border-radius:6px;
+    border:1px solid #bfdbfe;
+    display:inline-block;
+    letter-spacing:.5px;
+}
+
+.job-link:hover{
+    background:#dbeafe;
+}
+
+.badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:20px;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.3px;
+}
+
+.badge-blue{ background:#dbeafe; color:#1d4ed8; }
+.badge-green{ background:#dcfce7; color:#15803d; }
+.badge-orange{ background:#ffedd5; color:#c2410c; }
+.badge-purple{ background:#f3e8ff; color:#7e22ce; }
+.badge-red{ background:#fee2e2; color:#b91c1c; }
+.badge-gray{ background:#e5e7eb; color:#475569; }
+
+/* ================= MODAL ================= */
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.7);
+    z-index:500;
+    overflow:auto;
+    padding:30px;
+}
+
+.modal-box{
+    background:white;
+    max-width:1050px;
+    margin:15px auto;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 25px 60px rgba(0,0,0,.3);
+}
+
+.modal-header{
+    background:#0f172a;
+    color:white;
+    padding:18px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.modal-header h2{
+    font-size:18px;
+    font-weight:700;
+}
+
+.close{
+    font-size:24px;
+    cursor:pointer;
+    color:#94a3b8;
+    transition:.2s;
+}
+
+.close:hover{
+    color:white;
+}
+
+.modal-body{
+    padding:25px;
+}
+
+/* ================= FORM ================= */
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+}
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+
+.form-group.full{
+    grid-column:1/-1;
+}
+
+label{
+    font-size:12px;
+    font-weight:700;
+    color:#475569;
+    text-transform:uppercase;
+}
+
+input,textarea{
+    padding:10px 13px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    outline:none;
+    font-size:13px;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+
+textarea{
+    min-height:75px;
+    resize:vertical;
+}
+
+.modal-footer{
+    margin-top:22px;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    border-top:1px solid #f1f5f9;
+    padding-top:15px;
+}
+
+/* ================= FULL VIEW ================= */
+
+.job-info{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-bottom:20px;
+}
+
+.info-box{
+    background:#f8fafc;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid #edf2f7;
+}
+
+.info-label{
+    font-size:10px;
+    color:#64748b;
+    margin-bottom:4px;
+    font-weight:700;
+    text-transform:uppercase;
+}
+
+.info-value{
+    font-weight:700;
+    font-size:13px;
+    color:#1e293b;
+}
+
+/* ================= TIMELINE ================= */
+
+.timeline{
+    position:relative;
+    margin:20px 0 25px 0;
+}
+
+.timeline:before{
+    content:"";
+    position:absolute;
+    left:18px;
+    top:0;
+    bottom:0;
+    width:2px;
+    background:#e2e8f0;
+}
+
+.timeline-item{
+    position:relative;
+    padding-left:52px;
+    margin-bottom:18px;
+}
+
+.timeline-dot{
+    position:absolute;
+    left:8px;
+    top:0;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    background:#cbd5e1;
+    border:3px solid white;
+    box-shadow:0 0 0 2px #cbd5e1;
+}
+
+.timeline-item.done .timeline-dot{
+    background:#16a34a;
+    box-shadow:0 0 0 2px #16a34a;
+}
+
+.timeline-item.current .timeline-dot{
+    background:#2563eb;
+    box-shadow:0 0 0 2px #2563eb;
+}
+
+.timeline-title{
+    font-weight:700;
+    font-size:13px;
+}
+
+.timeline-time{
+    font-size:11px;
+    color:#64748b;
+    margin-top:3px;
+}
+
+.timeline-remarks{
+    margin-top:4px;
+    font-size:12px;
+    color:#475569;
+}
+
+/* ================= PRINT STYLES ================= */
+
+@media print{
+    body *{ visibility:hidden; }
+    #printableSlip, #printableSlip *{ visibility:visible; }
+    #printableSlip{ position:absolute; left:0; top:0; width:100%; display:block !important; }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1100px){
+    .cards{ grid-template-columns:repeat(3,1fr); }
+}
+
+@media(max-width:700px){
+    .cards{ grid-template-columns:repeat(2,1fr); }
+    .form-grid, .job-info{ grid-template-columns:1fr; }
+    .modal{ padding:10px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+
+<div class="header">
+    <div class="logo-area">
+        <div class="logo-badge">CD</div>
+        <div class="logo">
+            OFFSET <span>ORDER MANAGEMENT</span>
+        </div>
+    </div>
+
+    <div class="header-right">
+        <div class="sync-status" id="cloudStatus">
+            <span class="pulse-dot"></span> <span id="syncText">Local Storage</span>
+        </div>
+        <div id="clock">--</div>
+    </div>
+</div>
+
+<div class="container">
+
+<!-- ================= DASHBOARD ================= -->
+
+<div class="cards">
+    <div class="card">
+        <div class="card-title">TOTAL JOBS</div>
+        <div class="card-value" id="totalJobs">0</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">TODAY ORDERS</div>
+        <div class="card-value" id="todayJobs">0</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">IN PRODUCTION</div>
+        <div class="card-value" id="productionJobs" style="color:#d97706;">0</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">SAMPLES</div>
+        <div class="card-value" id="sampleJobs" style="color:#2563eb;">0</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">COMPLETED</div>
+        <div class="card-value" id="completedJobs" style="color:#16a34a;">0</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">BILL / BALANCE PENDING</div>
+        <div class="card-value" id="billPending" style="color:#dc2626;">0</div>
+    </div>
+</div>
+
+<!-- ================= TOOLBAR ================= -->
+
+<div class="toolbar">
+    <button class="btn-primary" onclick="openNewJob()">
+        + NEW JOB (13 OPTIONS)
+    </button>
+
+    <button class="btn-success" onclick="openWorkflowModalGlobal()">
+        ⏱️ WORKFLOW PROGRESS
+    </button>
+
+    <button class="btn-secondary" onclick="openCloudModal()">
+        ⚙️ CLOUD SYNC
+    </button>
+
+    <button class="btn-secondary" onclick="exportCSV()">
+        ⬇ EXPORT CSV
+    </button>
+
+    <input
+        class="search"
+        id="searchBox"
+        placeholder="Search Job No / Company / Brand / Style / PO / Status..."
+        oninput="renderJobs()"
+    >
+
+    <select id="statusFilter" onchange="renderJobs()">
+        <option value="ALL">ALL WORKFLOW STATUS</option>
+        <option value="ORDER">ORDER RECEIVED</option>
+        <option value="DESIGN">DESIGN</option>
+        <option value="PLATE">BLOCK / PLATE / SCREEN</option>
+        <option value="PRINTING">PRINTING</option>
+        <option value="LAMINATION">LAMINATION / PASTING</option>
+        <option value="CUTTING">CUTTING / DIE CUTTING</option>
+        <option value="PACKING">PACKING</option>
+        <option value="DELIVERY">DELIVERY CHALLAN</option>
+        <option value="BILL">BILL</option>
+        <option value="COMPLETED">COMPLETED</option>
+    </select>
+</div>
+
+<!-- ================= JOB TABLE ================= -->
+
+<div class="table-box">
+<table>
+<thead>
+<tr>
+    <th>JOB NO. (CLICK TO VIEW)</th>
+    <th>COMPANY</th>
+    <th>BRAND & STYLE</th>
+    <th>P.O. NO.</th>
+    <th>QTY</th>
+    <th>PRINTING METHOD</th>
+    <th>WORKFLOW STATUS</th>
+    <th>DATE & TIME</th>
+    <th>ACTION</th>
+</tr>
+</thead>
+<tbody id="jobTable"></tbody>
+</table>
+</div>
+
+</div>
+
+<!-- ========================================================= -->
+<!-- NEW / EDIT JOB MODAL (EXACT 0-12 OPTIONS) -->
+<!-- ========================================================= -->
+
+<div class="modal" id="jobModal">
+<div class="modal-box">
+<div class="modal-header">
+    <h2 id="jobModalTitle">NEW JOB ENTRY</h2>
+    <span class="close" onclick="closeModal('jobModal')">&times;</span>
+</div>
+
+<div class="modal-body">
+<input type="hidden" id="editJobId">
+
+<div class="form-grid">
+
+    <div class="form-group">
+        <label>0. COMPANY NAME *</label>
+        <input id="companyName" placeholder="e.g. Classic Polo / Eastman">
+    </div>
+
+    <div class="form-group">
+        <label>1. SAMPLE / ORDER *</label>
+        <select id="sampleOrder">
+            <option value="ORDER">ORDER (Bulk)</option>
+            <option value="SAMPLE">SAMPLE</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>2. BRAND</label>
+        <input id="brand" placeholder="e.g. Zara / Tommy / Arrow">
+    </div>
+
+    <div class="form-group">
+        <label>3. STYLE NO.</label>
+        <input id="styleNo" placeholder="e.g. ST-9022-A">
+    </div>
+
+    <div class="form-group">
+        <label>4. P.O. NO.</label>
+        <input id="poNo" placeholder="e.g. PO-88741">
+    </div>
+
+    <div class="form-group">
+        <label>ORDER QUANTITY (NOS) *</label>
+        <input type="number" id="orderQty" placeholder="e.g. 5000">
+    </div>
+
+    <div class="form-group">
+        <label>WHATSAPP / PHONE NO.</label>
+        <input type="tel" id="clientPhone" placeholder="10 Digits for Updates">
+    </div>
+
+    <div class="form-group">
+        <label>5. DESIGN / ARTWORK DETAILS</label>
+        <input id="design" placeholder="e.g. 350 GSM Satin Tag 4x8 cm">
+    </div>
+
+    <div class="form-group">
+        <label>6. BLOCK / PLATE / SCREEN</label>
+        <select id="blockPlate">
+            <option value="PLATE">PLATE (CTP)</option>
+            <option value="BLOCK">BLOCK (Polymer/Zinc)</option>
+            <option value="SCREEN">SCREEN</option>
+            <option value="NONE">NONE (Direct Digital)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>7. PRINTING METHOD</label>
+        <select id="printing">
+            <option value="OFFSET PRINTING">OFFSET PRINTING</option>
+            <option value="ROTARY PRINTING">ROTARY PRINTING</option>
+            <option value="SCREEN PRINTING">SCREEN PRINTING</option>
+            <option value="DIGITAL PRINTING">DIGITAL PRINTING</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>8. LAMINATION / PASTING</label>
+        <select id="lamination">
+            <option value="NOT REQUIRED">NOT REQUIRED</option>
+            <option value="GLOSS LAMINATION">GLOSS LAMINATION</option>
+            <option value="MATTE LAMINATION">MATTE LAMINATION</option>
+            <option value="PASTING">PASTING (Duplex Board)</option>
+            <option value="SPOT UV">MATTE + SPOT UV</option>
+            <option value="FOIL STAMPING">FOIL STAMPING</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>9. CUTTING / DIE CUTTING</label>
+        <select id="cutting">
+            <option value="STRAIGHT CUTTING">STRAIGHT CUTTING</option>
+            <option value="DIE CUTTING">DIE CUTTING</option>
+            <option value="ULTRASONIC CUT">ULTRASONIC CUT</option>
+            <option value="PUNCH HOLE + CUT">PUNCH HOLE + CUT</option>
+            <option value="NOT REQUIRED">NOT REQUIRED</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>10. PACKING</label>
+        <input id="packing" placeholder="e.g. 100 Pcs Box / Polybag">
+    </div>
+
+    <div class="form-group">
+        <label>INITIAL WORKFLOW PROCESS</label>
+        <select id="initialProcess">
+            <option value="ORDER">ORDER RECEIVED</option>
+            <option value="DESIGN">DESIGN</option>
+            <option value="PLATE">BLOCK / PLATE / SCREEN</option>
+            <option value="PRINTING">PRINTING</option>
+            <option value="LAMINATION">LAMINATION / PASTING</option>
+            <option value="CUTTING">CUTTING / DIE CUTTING</option>
+            <option value="PACKING">PACKING</option>
+            <option value="DELIVERY">DELIVERY CHALLAN</option>
+            <option value="BILL">BILL</option>
+            <option value="COMPLETED">COMPLETED</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>11. DELIVERY CHALLAN (DC NO.)</label>
+        <input id="deliveryChallan" placeholder="e.g. DC-1049">
+    </div>
+
+    <div class="form-group">
+        <label>12. BILL / INVOICE NO.</label>
+        <input id="bill" placeholder="e.g. INV-2026/04">
+    </div>
+
+    <div class="form-group">
+        <label>TOTAL BILL AMOUNT (₹)</label>
+        <input type="number" id="totalAmt" placeholder="0">
+    </div>
+
+    <div class="form-group">
+        <label>PENDING BALANCE AMOUNT (₹)</label>
+        <input type="number" id="balAmt" placeholder="0" style="color:#dc2626; font-weight:700;">
+    </div>
+
+    <div class="form-group full">
+        <label>REMARKS / SPECIAL INSTRUCTIONS</label>
+        <textarea id="remarks" placeholder="Add custom notes here..."></textarea>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button class="btn-dark" onclick="closeModal('jobModal')">CANCEL</button>
+    <button class="btn-primary" onclick="saveJob()">SAVE ORDER</button>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ========================================================= -->
+<!-- WORKFLOW MODAL (PROGRESS UPDATE + DATE & TIME) -->
+<!-- ========================================================= -->
+
+<div class="modal" id="workflowModal">
+<div class="modal-box" style="max-width:750px;">
+<div class="modal-header">
+    <h2 id="wfModalHeader">WORKFLOW PROGRESS UPDATE</h2>
+    <span class="close" onclick="closeModal('workflowModal')">&times;</span>
+</div>
+
+<div class="modal-body">
+<div class="form-grid">
+
+    <div class="form-group full">
+        <label>SELECT JOB</label>
+        <select id="workflowJob" onchange="showWorkflowCurrent()"></select>
+    </div>
+
+    <div class="form-group">
+        <label>TARGET PROCESS (STAGE)</label>
+        <select id="workflowProcess">
+            <option value="ORDER">ORDER RECEIVED</option>
+            <option value="DESIGN">DESIGN</option>
+            <option value="PLATE">BLOCK / PLATE / SCREEN</option>
+            <option value="PRINTING">PRINTING</option>
+            <option value="LAMINATION">LAMINATION / PASTING</option>
+            <option value="CUTTING">CUTTING / DIE CUTTING</option>
+            <option value="PACKING">PACKING</option>
+            <option value="DELIVERY">DELIVERY CHALLAN</option>
+            <option value="BILL">BILL</option>
+            <option value="COMPLETED">COMPLETED</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>PROCESS STATUS</label>
+        <select id="workflowStatus">
+            <option value="RUNNING">RUNNING</option>
+            <option value="COMPLETED">COMPLETED</option>
+            <option value="PENDING">PENDING</option>
+            <option value="HOLD">HOLD</option>
+        </select>
+    </div>
+
+    <div class="form-group full">
+        <label>OPERATOR REMARKS / LOG DETAILS</label>
+        <textarea id="workflowRemarks" placeholder="e.g. 5000 Sheets printing completed on Machine 2 / CTP Plates delivered"></textarea>
+    </div>
+
+    <div class="form-group full" style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0;">
+        <span style="font-size:11px; font-weight:700; color:#475569;">AUTOMATIC SYSTEM TIMESTAMP:</span>
+        <div id="liveModalTime" style="font-size:13px; font-weight:800; color:#1e293b; margin-top:3px;">--</div>
+    </div>
+
+</div>
+
+<div class="modal-footer">
+    <button class="btn-dark" onclick="closeModal('workflowModal')">CANCEL</button>
+    <button class="btn-success" onclick="updateWorkflow()">SAVE & RECORD TIME</button>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- ========================================================= -->
+<!-- FULL JOB VIEW (ALL 13 SPECS + TIMELINE + HISTORY) -->
+<!-- ========================================================= -->
+
+<div class="modal" id="viewModal">
+<div class="modal-box">
+<div class="modal-header">
+    <h2 id="viewTitle">FULL JOB VIEW</h2>
+    <span class="close" onclick="closeModal('viewModal')">&times;</span>
+</div>
+
+<div class="modal-body">
+    <div id="jobDetails"></div>
+
+    <h3 style="margin-top:25px; font-size:14px; text-transform:uppercase; color:#1e293b;">WORKFLOW TIMELINE TRACKER</h3>
+    <div class="timeline" id="timeline"></div>
+
+    <div class="history">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="font-size:14px; text-transform:uppercase; color:#1e293b;">WORKFLOW HISTORY (DATE & TIME AUDIT)</h3>
+        </div>
+        <div class="table-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>DATE & TIME</th>
+                        <th>PROCESS</th>
+                        <th>STATUS</th>
+                        <th>REMARKS</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-footer" style="margin-top:25px;">
+        <button class="btn-success" id="btnModalWhatsapp">💬 WHATSAPP STATUS</button>
+        <button class="btn-primary" id="btnModalPrint">🖨 PRINT ROUTE SLIP</button>
+        <button class="btn-dark" onclick="closeModal('viewModal')">CLOSE</button>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ========================================================= -->
+<!-- FIREBASE CLOUD CONFIG MODAL -->
+<!-- ========================================================= -->
+
+<div class="modal" id="cloudModal">
+<div class="modal-box" style="max-width:550px;">
+<div class="modal-header">
+    <h2>FIREBASE CLOUD SYNC CONFIG</h2>
+    <span class="close" onclick="closeModal('cloudModal')">&times;</span>
+</div>
+
+<div class="modal-body">
+    <p style="font-size:12px; color:#64748b; margin-bottom:15px;">
+        Paste your Firebase credentials to sync live across PC and Android Mobile.
+    </p>
+
+    <div class="form-group" style="margin-bottom:12px;">
+        <label>API KEY</label>
+        <input id="cfgApiKey" placeholder="AIzaSy...">
+    </div>
+
+    <div class="form-group" style="margin-bottom:12px;">
+        <label>DATABASE URL</label>
+        <input id="cfgDbUrl" placeholder="https://your-app-default-rtdb.firebaseio.com">
+    </div>
+
+    <div class="form-group" style="margin-bottom:15px;">
+        <label>PROJECT ID</label>
+        <input id="cfgProjectId" placeholder="your-project-id">
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn-danger" onclick="clearCloudConfig()">RESET</button>
+        <button class="btn-primary" onclick="saveCloudConfig()">CONNECT CLOUD</button>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- ========================================================= -->
+<!-- WORKSHOP PRINT TICKET (CTRL+P) -->
+<!-- ========================================================= -->
+
+<div id="printableSlip" style="display:none;">
+<div style="max-width:800px; margin:auto; border:3px solid #000; padding:25px; font-family:Arial,sans-serif;">
+    <div style="display:flex; justify-content:space-between; border-bottom:3px solid #000; padding-bottom:15px; margin-bottom:15px;">
+        <div>
+            <h1 style="font-size:24px; font-weight:900; margin-bottom:4px;">CREATIVE DIGITAL</h1>
+            <p style="font-size:12px; font-weight:bold;">PREPRESS & PRINTING PRODUCTION ROUTE SLIP</p>
+        </div>
+        <div style="text-align:right;">
+            <div id="pJobNo" style="font-size:20px; font-weight:900;"></div>
+            <div id="pJobDate" style="font-size:12px; margin-top:4px;"></div>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; border-bottom:2px solid #000; padding-bottom:15px; margin-bottom:15px; font-size:13px;">
+        <div>
+            <p><b>0. COMPANY:</b> <span id="pCompany"></span></p>
+            <p><b>2. BRAND:</b> <span id="pBrand"></span></p>
+            <p><b>3. STYLE NO:</b> <span id="pStyle"></span></p>
+            <p><b>4. P.O. NO:</b> <span id="pPo"></span></p>
+        </div>
+        <div style="background:#f1f5f9; padding:10px; border:1px solid #000;">
+            <p><b>1. TYPE:</b> <span id="pType" style="font-weight:900; text-decoration:underline;"></span></p>
+            <p><b>QUANTITY:</b> <span id="pQty" style="font-size:16px; font-weight:900;"></span> Nos</p>
+            <p><b>11. DC NO:</b> <span id="pDc"></span></p>
+            <p><b>12. BILL NO:</b> <span id="pBill"></span></p>
+        </div>
+    </div>
+
+    <div style="font-size:12px; line-height:1.7; border-bottom:2px solid #000; padding-bottom:15px; margin-bottom:15px;">
+        <h4 style="text-transform:uppercase; margin-bottom:6px;">Process & Tool Specifications:</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <p><b>5. Design:</b> <span id="pDesign"></span></p>
+            <p><b>6. Prepress:</b> <span id="pPlate"></span></p>
+            <p><b>7. Print Machine:</b> <span id="pPrint"></span></p>
+            <p><b>8. Lamination/Pasting:</b> <span id="pLam"></span></p>
+            <p><b>9. Cutting:</b> <span id="pCut"></span></p>
+            <p><b>10. Packing:</b> <span id="pPack"></span></p>
+        </div>
+    </div>
+
+    <div style="font-size:11px; margin-bottom:25px;">
+        <h4 style="text-transform:uppercase; margin-bottom:6px;">Workflow Log Record:</h4>
+        <div id="pHistoryLog" style="line-height:1.5;"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; text-align:center; font-size:12px; font-weight:bold; margin-top:40px;">
+        <div style="border-top:1px solid #000; padding-top:5px;">Prepared By</div>
+        <div style="border-top:1px solid #000; padding-top:5px;">Operator Sign</div>
+        <div style="border-top:1px solid #000; padding-top:5px;">QC & Dispatch Sign</div>
+    </div>
+</div>
+</div>
+
+<script>
+
+/* =========================================================
+   DATA & WORKFLOW PROCESS DEFINITIONS
+========================================================= */
+
+let jobs = JSON.parse(localStorage.getItem("offsetJobs") || "[]");
+let db = null;
+
+const processes = [
+    {key:"ORDER", name:"ORDER RECEIVED"},
+    {key:"DESIGN", name:"DESIGN"},
+    {key:"PLATE", name:"BLOCK / PLATE / SCREEN"},
+    {key:"PRINTING", name:"PRINTING"},
+    {key:"LAMINATION", name:"LAMINATION / PASTING"},
+    {key:"CUTTING", name:"CUTTING / DIE CUTTING"},
+    {key:"PACKING", name:"PACKING"},
+    {key:"DELIVERY", name:"DELIVERY CHALLAN"},
+    {key:"BILL", name:"BILL"},
+    {key:"COMPLETED", name:"COMPLETED"}
+];
+
+/* =========================================================
+   FIREBASE REALTIME DATABASE SYNC
+========================================================= */
+
+function initFirebase(){
+    const cfg = JSON.parse(localStorage.getItem("cd_firebase_config") || "{}");
+    if(cfg.apiKey && cfg.databaseURL){
+        try{
+            firebase.initializeApp(cfg);
+            db = firebase.database();
+            document.getElementById("syncText").innerText = "Firebase Cloud Connected";
+            document.getElementById("cloudStatus").style.background = "#064e3b";
+            document.getElementById("cloudStatus").style.color = "#6ee7b7";
+
+            db.ref("offset_jobs").on("value", snapshot => {
+                const cloudData = snapshot.val();
+                if(cloudData){
+                    jobs = Array.isArray(cloudData) ? cloudData : Object.values(cloudData);
+                    renderAll();
+                }
+            });
+            return;
+        }catch(err){
+            console.error("Firebase config error:", err);
+            document.getElementById("syncText").innerText = "Cloud Sync Error";
+            document.getElementById("cloudStatus").style.background = "#7f1d1d";
+            document.getElementById("cloudStatus").style.color = "#fca5a5";
+        }
+    }
+    document.getElementById("syncText").innerText = "Local Storage Active";
+}
+
+function persistData(){
+    localStorage.setItem("offsetJobs", JSON.stringify(jobs));
+    if(db){
+        db.ref("offset_jobs").set(jobs);
+    }
+    renderAll();
+}
+
+/* =========================================================
+   DATE & TIME UTILITIES
+========================================================= */
+
+function nowDateTime(){
+    const d = new Date();
+    return d.toLocaleString("en-IN", {
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:true
+    });
+}
+
+function todayDate(){
+    const d = new Date();
+    return d.toLocaleDateString("en-IN", {
+        day:"2-digit",
+        month:"2-digit",
+        year:"numeric"
+    });
+}
+
+function updateClock(){
+    document.getElementById("clock").innerText = new Date().toLocaleString("en-IN",{
+        day:"2-digit",
+        month:"short",
+        year:"numeric",
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit",
+        hour12:true
+    });
+}
+
+/* =========================================================
+   JOB NUMBER GENERATOR
+========================================================= */
+
+function generateJobNo(){
+    const year = new Date().getFullYear();
+    let max = 0;
+    jobs.forEach(job => {
+        const match = (job.jobNo || "").match(/(\d+)$/);
+        if(match){
+            const n = parseInt(match[1]);
+            if(n > max) max = n;
+        }
+    });
+    return "JOB-" + year + "-" + String(max + 1).padStart(4, "0");
+}
+
+/* =========================================================
+   OPEN & CLEAR FORM
+========================================================= */
+
+function openNewJob(){
+    document.getElementById("jobModalTitle").innerText = "NEW JOB (ALL 13 OPTIONS)";
+    document.getElementById("editJobId").value = "";
+    clearForm();
+    document.getElementById("jobModal").style.display = "block";
+}
+
+function clearForm(){
+    [
+        "companyName", "brand", "styleNo", "poNo", "orderQty",
+        "clientPhone", "design", "packing", "deliveryChallan",
+        "bill", "totalAmt", "balAmt", "remarks"
+    ].forEach(id => {
+        document.getElementById(id).value = "";
+    });
+
+    document.getElementById("sampleOrder").value = "ORDER";
+    document.getElementById("blockPlate").value = "PLATE";
+    document.getElementById("printing").value = "OFFSET PRINTING";
+    document.getElementById("lamination").value = "NOT REQUIRED";
+    document.getElementById("cutting").value = "STRAIGHT CUTTING";
+    document.getElementById("initialProcess").value = "ORDER";
+}
+
+/* =========================================================
+   SAVE / UPDATE JOB
+========================================================= */
+
+function saveJob(){
+    const company = document.getElementById("companyName").value.trim();
+    if(!company){
+        alert("Please enter 0. COMPANY NAME.");
+        return;
+    }
+
+    const editId = document.getElementById("editJobId").value;
+    const nowTime = nowDateTime();
+
+    if(editId){
+        const job = jobs.find(j => j.id == editId);
+        if(!job) return;
+
+        job.company = company;
+        job.sampleOrder = document.getElementById("sampleOrder").value;
+        job.brand = document.getElementById("brand").value.trim();
+        job.styleNo = document.getElementById("styleNo").value.trim();
+        job.poNo = document.getElementById("poNo").value.trim();
+        job.qty = Number(document.getElementById("orderQty").value) || 0;
+        job.phone = document.getElementById("clientPhone").value.trim();
+        job.design = document.getElementById("design").value.trim();
+        job.blockPlate = document.getElementById("blockPlate").value;
+        job.printing = document.getElementById("printing").value;
+        job.lamination = document.getElementById("lamination").value;
+        job.cutting = document.getElementById("cutting").value;
+        job.packing = document.getElementById("packing").value.trim();
+        job.deliveryChallan = document.getElementById("deliveryChallan").value.trim();
+        job.bill = document.getElementById("bill").value.trim();
+        job.totalAmt = Number(document.getElementById("totalAmt").value) || 0;
+        job.balAmt = Number(document.getElementById("balAmt").value) || 0;
+        job.remarks = document.getElementById("remarks").value.trim();
+    }else{
+        const initProc = document.getElementById("initialProcess").value;
+        const job = {
+            id: Date.now(),
+            jobNo: generateJobNo(),
+            company: company,
+            sampleOrder: document.getElementById("sampleOrder").value,
+            brand: document.getElementById("brand").value.trim(),
+            styleNo: document.getElementById("styleNo").value.trim(),
+            poNo: document.getElementById("poNo").value.trim(),
+            qty: Number(document.getElementById("orderQty").value) || 0,
+            phone: document.getElementById("clientPhone").value.trim(),
+            design: document.getElementById("design").value.trim(),
+            blockPlate: document.getElementById("blockPlate").value,
+            printing: document.getElementById("printing").value,
+            lamination: document.getElementById("lamination").value,
+            cutting: document.getElementById("cutting").value,
+            packing: document.getElementById("packing").value.trim(),
+            deliveryChallan: document.getElementById("deliveryChallan").value.trim(),
+            bill: document.getElementById("bill").value.trim(),
+            totalAmt: Number(document.getElementById("totalAmt").value) || 0,
+            balAmt: Number(document.getElementById("balAmt").value) || 0,
+            remarks: document.getElementById("remarks").value.trim(),
+            createdDate: nowTime,
+            status: initProc,
+            history: [
+                {
+                    date: nowTime,
+                    process: initProc,
+                    status: "COMPLETED",
+                    remarks: "Job Created & Registered"
+                }
+            ]
+        };
+        jobs.push(job);
+    }
+
+    persistData();
+    closeModal("jobModal");
+}
+
+/* =========================================================
+   EDIT & DELETE JOB
+========================================================= */
+
+function editJob(id){
+    const job = jobs.find(j => j.id == id);
+    if(!job) return;
+
+    document.getElementById("jobModalTitle").innerText = "EDIT " + job.jobNo;
+    document.getElementById("editJobId").value = job.id;
+
+    document.getElementById("companyName").value = job.company || "";
+    document.getElementById("sampleOrder").value = job.sampleOrder || "ORDER";
+    document.getElementById("brand").value = job.brand || "";
+    document.getElementById("styleNo").value = job.styleNo || "";
+    document.getElementById("poNo").value = job.poNo || "";
+    document.getElementById("orderQty").value = job.qty || "";
+    document.getElementById("clientPhone").value = job.phone || "";
+    document.getElementById("design").value = job.design || "";
+    document.getElementById("blockPlate").value = job.blockPlate || "PLATE";
+    document.getElementById("printing").value = job.printing || "OFFSET PRINTING";
+    document.getElementById("lamination").value = job.lamination || "NOT REQUIRED";
+    document.getElementById("cutting").value = job.cutting || "STRAIGHT CUTTING";
+    document.getElementById("packing").value = job.packing || "";
+    document.getElementById("deliveryChallan").value = job.deliveryChallan || "";
+    document.getElementById("bill").value = job.bill || "";
+    document.getElementById("totalAmt").value = job.totalAmt || 0;
+    document.getElementById("balAmt").value = job.balAmt || 0;
+    document.getElementById("remarks").value = job.remarks || "";
+
+    document.getElementById("jobModal").style.display = "block";
+}
+
+function deleteJob(id){
+    const job = jobs.find(j => j.id == id);
+    if(!job) return;
+    if(confirm("Are you sure you want to delete " + job.jobNo + " (" + job.company + ")?")){
+        jobs = jobs.filter(j => j.id != id);
+        persistData();
+    }
+}
+
+/* =========================================================
+   WORKFLOW PROGRESS MODAL (SEPARATE BUTTON CLICK)
+========================================================= */
+
+function openWorkflowModalGlobal(){
+    if(jobs.length === 0){
+        alert("No jobs found.");
+        return;
+    }
+    populateWorkflowDropdown();
+    document.getElementById("wfModalHeader").innerText = "WORKFLOW PROGRESS UPDATE";
+    document.getElementById("liveModalTime").innerText = nowDateTime();
+    document.getElementById("workflowModal").style.display = "block";
+    showWorkflowCurrent();
+}
+
+function openWorkflowSingle(id){
+    populateWorkflowDropdown();
+    document.getElementById("workflowJob").value = id;
+    showWorkflowCurrent();
+    const job = jobs.find(j => j.id == id);
+    document.getElementById("wfModalHeader").innerText = "UPDATE WORKFLOW: " + (job ? job.jobNo : "");
+    document.getElementById("liveModalTime").innerText = nowDateTime();
+    document.getElementById("workflowModal").style.display = "block";
+}
+
+function populateWorkflowDropdown(){
+    const select = document.getElementById("workflowJob");
+    select.innerHTML = "";
+    jobs.forEach(job => {
+        const option = document.createElement("option");
+        option.value = job.id;
+        option.textContent = job.jobNo + " - " + job.company + " (Brand: " + (job.brand || "-") + ")";
+        select.appendChild(option);
+    });
+}
+
+function showWorkflowCurrent(){
+    const id = document.getElementById("workflowJob").value;
+    const job = jobs.find(j => j.id == id);
+    if(!job) return;
+    document.getElementById("workflowProcess").value = job.status;
+}
+
+function updateWorkflow(){
+    const id = document.getElementById("workflowJob").value;
+    const job = jobs.find(j => j.id == id);
+    if(!job) return;
+
+    const process = document.getElementById("workflowProcess").value;
+    const status = document.getElementById("workflowStatus").value;
+    const remarks = document.getElementById("workflowRemarks").value.trim();
+    const recordedTime = nowDateTime();
+
+    job.status = process;
+    if(!job.history) job.history = [];
+
+    job.history.push({
+        date: recordedTime,
+        process: process,
+        status: status,
+        remarks: remarks || "Workflow updated"
+    });
+
+    persistData();
+    document.getElementById("workflowRemarks").value = "";
+    closeModal("workflowModal");
+
+    alert(
+        job.jobNo + "\n\n" +
+        "Workflow Stage Updated: " + processName(process) + "\n" +
+        "Status: " + status + "\n" +
+        "Timestamp: " + recordedTime
+    );
+}
+
+/* =========================================================
+   FULL JOB VIEW (CLICK ON JOB NO.)
+========================================================= */
+
+function viewJob(id){
+    const job = jobs.find(j => j.id == id);
+    if(!job) return;
+
+    document.getElementById("viewTitle").innerText = job.jobNo + " - FULL ORDER SPECIFICATION";
+
+    document.getElementById("jobDetails").innerHTML = `
+        <div class="job-info">
+            ${info("0. COMPANY NAME", job.company)}
+            ${info("1. SAMPLE / ORDER", job.sampleOrder)}
+            ${info("2. BRAND", job.brand)}
+            ${info("3. STYLE NO.", job.styleNo)}
+            ${info("4. P.O. NO.", job.poNo)}
+            ${info("ORDER QUANTITY", (job.qty ? job.qty.toLocaleString() + " Nos" : "-"))}
+            ${info("5. DESIGN / ARTWORK", job.design)}
+            ${info("6. BLOCK / PLATE / SCREEN", job.blockPlate)}
+            ${info("7. PRINTING METHOD", job.printing)}
+            ${info("8. LAMINATION / PASTING", job.lamination)}
+            ${info("9. CUTTING PROCESS", job.cutting)}
+            ${info("10. PACKING", job.packing)}
+            ${info("11. DELIVERY CHALLAN", job.deliveryChallan)}
+            ${info("12. BILL / INVOICE NO.", job.bill)}
+            ${info("BALANCE PENDING", (job.balAmt ? "₹" + job.balAmt.toLocaleString() : "₹0"))}
+            ${info("CREATED ON", job.createdDate)}
+            ${info("CURRENT WORKFLOW STATUS", processName(job.status))}
+            ${info("PHONE / WHATSAPP", job.phone)}
+        </div>
+
+        <div style="background:#f8fafc; padding:12px; border-radius:10px; border:1px solid #edf2f7; font-size:13px;">
+            <b>SPECIAL REMARKS:</b><br>
+            <span style="color:#475569;">${escapeHtml(job.remarks || "No remarks provided.")}</span>
+        </div>
+    `;
+
+    renderTimeline(job);
+    renderHistory(job);
+
+    document.getElementById("btnModalWhatsapp").onclick = function(){ sendWhatsApp(job.id); };
+    document.getElementById("btnModalPrint").onclick = function(){ printJobCard(job.id); };
+
+    document.getElementById("viewModal").style.display = "block";
+}
+
+function info(label, value){
+    return `
+    <div class="info-box">
+        <div class="info-label">${label}</div>
+        <div class="info-value">${escapeHtml(value || "-")}</div>
+    </div>
+    `;
+}
+
+/* =========================================================
+   TIMELINE & HISTORY
+========================================================= */
+
+function renderTimeline(job){
+    const container = document.getElementById("timeline");
+    container.innerHTML = "";
+
+    const currentIndex = processes.findIndex(p => p.key === job.status);
+
+    processes.forEach((process, index) => {
+        const completed =
+            index < currentIndex ||
+            (index === currentIndex &&
+             (job.history || []).some(h => h.process === process.key && h.status === "COMPLETED"));
+
+        const current = index === currentIndex && !completed;
+
+        const history = [...(job.history || [])]
+            .reverse()
+            .find(h => h.process === process.key);
+
+        const div = document.createElement("div");
+        div.className = "timeline-item " + (completed ? "done " : "") + (current ? "current" : "");
+
+        div.innerHTML = `
+            <div class="timeline-dot"></div>
+            <div class="timeline-title">${process.name}</div>
+            ${
+                history
+                ? `<div class="timeline-time">${history.date} — <b>${history.status}</b></div>
+                   <div class="timeline-remarks">${escapeHtml(history.remarks || "")}</div>`
+                : `<div class="timeline-time">Pending</div>`
+            }
+        `;
+        container.appendChild(div);
+    });
+}
+
+function renderHistory(job){
+    const tbody = document.getElementById("historyTable");
+    tbody.innerHTML = "";
+
+    [...(job.history || [])].reverse().forEach(h => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><b>${h.date}</b></td>
+            <td>${processName(h.process)}</td>
+            <td><span class="badge ${statusClass(h.status)}">${h.status}</span></td>
+            <td>${escapeHtml(h.remarks || "-")}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+/* =========================================================
+   PROCESS HELPERS
+========================================================= */
+
+function processName(key){
+    const p = processes.find(x => x.key === key);
+    return p ? p.name : key;
+}
+
+function statusClass(status){
+    if(status === "COMPLETED") return "badge-green";
+    if(status === "RUNNING") return "badge-blue";
+    if(status === "HOLD") return "badge-red";
+    if(status === "PENDING") return "badge-orange";
+    return "badge-gray";
+}
+
+/* =========================================================
+   RENDER TABLE & DASHBOARD
+========================================================= */
+
+function renderJobs(){
+    const tbody = document.getElementById("jobTable");
+    tbody.innerHTML = "";
+
+    const search = document.getElementById("searchBox").value.toLowerCase();
+    const filter = document.getElementById("statusFilter").value;
+
+    const filtered = jobs.filter(job => {
+        const text = [
+            job.jobNo,
+            job.company,
+            job.brand,
+            job.styleNo,
+            job.poNo,
+            job.status,
+            job.sampleOrder
+        ].join(" ").toLowerCase();
+
+        const searchOK = text.includes(search);
+        const filterOK = (filter === "ALL" || job.status === filter);
+        return searchOK && filterOK;
+    });
+
+    if(filtered.length === 0){
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" style="text-align:center; padding:40px; color:#64748b; font-weight:600;">
+                    No matching orders found.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    filtered.slice().reverse().forEach(job => {
+        const tr = document.createElement("tr");
+        const lastLog = (job.history && job.history.length > 0) ? job.history[job.history.length - 1] : null;
+        const lastTime = lastLog ? lastLog.date : job.createdDate;
+
+        tr.innerHTML = `
+            <td>
+                <span class="job-link" onclick="viewJob(${job.id})" title="Click for Full View">
+                    🔍 ${job.jobNo}
+                </span>
+                <div style="margin-top:3px;">
+                    <span class="badge ${job.sampleOrder === 'SAMPLE' ? 'badge-orange' : 'badge-blue'}">
+                        ${job.sampleOrder}
+                    </span>
+                </div>
+            </td>
+            <td><b>${escapeHtml(job.company)}</b></td>
+            <td>
+                <div style="font-weight:700;">${escapeHtml(job.brand || "-")}</div>
+                <div style="font-size:11px; color:#64748b;">Style: ${escapeHtml(job.styleNo || "-")}</div>
+            </td>
+            <td>${escapeHtml(job.poNo || "-")}</td>
+            <td><b>${job.qty ? job.qty.toLocaleString() : "-"}</b></td>
+            <td>${escapeHtml(job.printing)}</td>
+            <td>
+                <span class="badge ${job.status === 'COMPLETED' ? 'badge-green' : 'badge-purple'}">
+                    ${processName(job.status)}
+                </span>
+                <div style="font-size:10px; color:#94a3b8; margin-top:2px;">${lastTime}</div>
+            </td>
+            <td>${job.createdDate}</td>
+            <td style="white-space:nowrap;">
+                <button class="btn-success" style="padding:6px 10px; font-size:11px;" onclick="openWorkflowSingle(${job.id})">
+                    ⏱️ UPDATE
+                </button>
+                <button class="btn-warning" style="padding:6px 10px; font-size:11px;" onclick="editJob(${job.id})">
+                    EDIT
+                </button>
+                <button class="btn-danger" style="padding:6px 10px; font-size:11px;" onclick="deleteJob(${job.id})">
+                    DEL
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function updateDashboard(){
+    const total = jobs.length;
+    const today = jobs.filter(j => (j.createdDate || "").startsWith(todayDate())).length;
+    const completed = jobs.filter(j => j.status === "COMPLETED").length;
+    const samples = jobs.filter(j => j.sampleOrder === "SAMPLE").length;
+    const production = jobs.filter(j => !["ORDER","COMPLETED"].includes(j.status)).length;
+    const billPending = jobs.filter(j => j.balAmt > 0 || !j.bill).length;
+
+    document.getElementById("totalJobs").innerText = total;
+    document.getElementById("todayJobs").innerText = today;
+    document.getElementById("productionJobs").innerText = production;
+    document.getElementById("sampleJobs").innerText = samples;
+    document.getElementById("completedJobs").innerText = completed;
+    document.getElementById("billPending").innerText = billPending;
+}
+
+function renderAll(){
+    renderJobs();
+    updateDashboard();
+}
+
+/* =========================================================
+   WHATSAPP & PRINT
+========================================================= */
+
+function sendWhatsApp(id){
+    const job = jobs.find(j => j.id == id);
+    if(!job) return;
+    const phone = job.phone ? job.phone.replace(/\D/g, '') : '';
+    const lastLog = (job.history && job.history.length > 0) ? job.history[job.history.length - 1] : null;
+
+    const msg = encodeURIComponent(
+        `*Order Status Update - Creative Digital*\n\n` +
+        `*Job No:* ${job.jobNo}\n` +
+        `*Company:* ${job.company}\n` +
+        `*Brand:* ${job.brand} | *Style:* ${job.styleNo}\n` +
+        `*Quantity:* ${(job.qty || 0).toLocaleString()} Nos\n` +
+        `*Current Stage:* ${processName(job.status)}\n` +
+        `*Last Updated:* ${lastLog ? lastLog.date : job.createdDate}\n` +
+        `*DC No:* ${job.deliveryChallan || 'Pending'}\n` +
+        `*Bill No:* ${job.bill || 'Pending'}\n` +
+        `*Pending Balance:* ₹${(job.balAmt || 0).toLocaleString()}\n\n` +
+        `Thank you for your business!`
+    );
+    window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+}
+
+function printJobCard(id){
+    const job = jobs.find(j => j.id == id);
+    if(!job) return;
+
+    document.getElementById("pJobNo").innerText = job.jobNo;
+    document.getElementById("pJobDate").innerText = "Date: " + job.createdDate;
+    document.getElementById("pCompany").innerText = job.company;
+    document.getElementById("pBrand").innerText = job.brand || "-";
+    document.getElementById("pStyle").innerText = job.styleNo || "-";
+    document.getElementById("pPo").innerText = job.poNo || "-";
+    document.getElementById("pType").innerText = job.sampleOrder;
+    document.getElementById("pQty").innerText = (job.qty || 0).toLocaleString();
+    document.getElementById("pDc").innerText = job.deliveryChallan || "-";
+    document.getElementById("pBill").innerText = job.bill || "-";
+    document.getElementById("pDesign").innerText = job.design || "-";
+    document.getElementById("pPlate").innerText = job.blockPlate;
+    document.getElementById("pPrint").innerText = job.printing;
+    document.getElementById("pLam").innerText = job.lamination;
+    document.getElementById("pCut").innerText = job.cutting;
+    document.getElementById("pPack").innerText = job.packing || "-";
+
+    const histContainer = document.getElementById("pHistoryLog");
+    histContainer.innerHTML = "";
+    (job.history || []).forEach(h => {
+        histContainer.innerHTML += `<div>• <b>${h.date}</b>: ${processName(h.process)} (${h.status}) - ${h.remarks || ''}</div>`;
+    });
+
+    window.print();
+}
+
+/* =========================================================
+   EXPORT CSV
+========================================================= */
+
+function exportCSV(){
+    let csv = "Job No,Created Date,Company,Type,Brand,Style No,PO No,Qty,Design,Prepress,Printing,Lamination,Cutting,Packing,Stage,DC No,Bill No,Total,Balance\n";
+    jobs.forEach(j => {
+        csv += `"${j.jobNo}","${j.createdDate}","${j.company}","${j.sampleOrder}","${j.brand}","${j.styleNo}","${j.poNo}",${j.qty},"${j.design}","${j.blockPlate}","${j.printing}","${j.lamination}","${j.cutting}","${j.packing}","${j.status}","${j.deliveryChallan}","${j.bill}",${j.totalAmt},${j.balAmt}\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Offset_Orders_${Date.now()}.csv`;
+    a.click();
+}
+
+/* =========================================================
+   FIREBASE CONFIG MODAL CONTROLS
+========================================================= */
+
+function openCloudModal(){
+    const cfg = JSON.parse(localStorage.getItem("cd_firebase_config") || "{}");
+    document.getElementById("cfgApiKey").value = cfg.apiKey || "";
+    document.getElementById("cfgDbUrl").value = cfg.databaseURL || "";
+    document.getElementById("cfgProjectId").value = cfg.projectId || "";
+    document.getElementById("cloudModal").style.display = "block";
+}
+
+function saveCloudConfig(){
+    const cfg = {
+        apiKey: document.getElementById("cfgApiKey").value.trim(),
+        databaseURL: document.getElementById("cfgDbUrl").value.trim(),
+        projectId: document.getElementById("cfgProjectId").value.trim()
+    };
+    localStorage.setItem("cd_firebase_config", JSON.stringify(cfg));
+    closeModal("cloudModal");
+    location.reload();
+}
+
+function clearCloudConfig(){
+    localStorage.removeItem("cd_firebase_config");
+    closeModal("cloudModal");
+    location.reload();
+}
+
+/* =========================================================
+   GENERAL MODAL CLOSE & ESCAPE HTML
+========================================================= */
+
+function closeModal(id){
+    document.getElementById(id).style.display = "none";
+}
+
+function escapeHtml(value){
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+window.onclick = function(event){
+    if(event.target.classList.contains("modal")){
+        event.target.style.display = "none";
+    }
+};
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+initFirebase();
+renderAll();
+updateClock();
+setInterval(updateClock, 1000);
+
+</script>
+</body>
+</html>
